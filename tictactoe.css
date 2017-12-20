@@ -1,0 +1,64 @@
+.box1 {
+    grid-area: box1;
+    border-right: 5px black solid;
+    border-bottom: 5px black solid;
+}
+
+.box2 {
+    grid-area: box2;
+    border-bottom: 5px black solid;
+}
+
+.box3 {
+    grid-area: box3;
+    border-left: 5px black solid;
+    border-bottom: 5px black solid;
+}
+
+.box4 {
+    grid-area: box4;
+    border-right: 5px black solid;
+}
+
+.box5 {
+    grid-area: box5;
+}
+
+.box6 {
+    grid-area: box6;
+    border-left: 5px black solid;
+}
+
+.box7 {
+    grid-area: box7;
+    border-top: 5px black solid;
+    border-right: 5px black solid;
+}
+
+.box8 {
+    grid-area: box8;
+    border-top: 5px black solid;
+}
+
+.box9 {
+    grid-area: box9;
+    border-left: 5px black solid;
+    border-top: 5px black solid;
+}
+
+#TicTacToe {
+    height: 400px;
+    width: 400px;
+    display: grid;
+    grid-template-areas:
+        'box1 box2 box3'
+        'box4 box5 box6'
+        'box7 box8 box9';
+    margin: auto;
+    
+    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+}
+
+.userChoice {
+    background-color: red;
+}
