@@ -9,11 +9,19 @@
     var squareEvents = [];
     var gameContainer = $("<div>").addClass("gameContainer");
 
+    var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset");
+    var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls");
+    var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions");
+    var playerSideDiv = $("<div>").text("Playing as X's").addClass("playerSide");
+    $("#TicTacToe").append(resetButton);
+    $("#TicTacToe").append(changeSidesButton);
+    $("#TicTacToe").append(instructionsDiv);
+    $("#TicTacToe").append(playerSideDiv);
+
 
     // Player definition
     function Player() {
        this.isPlayerX = true;
-       this.isPlayerTurn = true;
        this.moves = [];
 
        this.getPlayerSide = function() {
@@ -59,24 +67,27 @@
         square.on("click", function(event) {
             square.addClass("userChoice");
             playerOne.addMove(Number.parseInt(this.id));
-            if (checkWin(playerOne)) {
-                console.log("Found a winner");
+            /*
+            // If two players, not sure if I will use.
+            if (playerOne.getPlayerSide()) {
+                instructionsDiv.text("O's player turn");
+            } else {
+                instructionsDiv.text("X's player turn")
             }
-            $(document).off(event);
+            */
+            if (checkWin(playerOne)) {
+                instructionsDiv.text("You win! Hit reset to start a new game!");
+                for (var index = 0; index < squares.length; index += 1) {
+                    squares[index].off("click");
+                }
+                console.log("Found a winner");
+            } else {
+                $(document).off(event);
+            }
         });
     }
 
     $("#TicTacToe").append(gameContainer);
-
-
-    var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset");
-    var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls");
-    var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions");
-    var playerSideDiv = $("<div>").text("Playing as X's").addClass("playerSide");
-    $("#TicTacToe").append(resetButton);
-    $("#TicTacToe").append(changeSidesButton);
-    $("#TicTacToe").append(instructionsDiv);
-    $("#TicTacToe").append(playerSideDiv);
 
     function resetAllSquares() {
         console.log("the right spot");
@@ -96,6 +107,7 @@
     resetButton.on("click", function() {
         resetAllSquares();
         playerOne.resetMoves();
+        instructionsDiv.text("X player moves first");
     });
 
     changeSidesButton.on("click", function() {
