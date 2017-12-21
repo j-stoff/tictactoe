@@ -5,7 +5,8 @@
     let side = 400;
     let width = size * side;
     let height = size * side;
-    var squares = []
+    var squares = [];
+    var squareEvents = [];
     var gameContainer = $("<div>").addClass("gameContainer");
 
 
@@ -56,6 +57,7 @@
         square.on("click", function(event) {
             square.addClass("userChoice");
             playerOne.addMove(Number.parseInt(this.id));
+            checkWin();
             $(document).off(event);
         });
     }
@@ -101,15 +103,105 @@
         playerOne.changeSides();
     });
 
+    // Descending order
     function sortMoves(firstMove, secondMove) {
-        return firstMove - secondMove;
+        return secondMove - firstMove;
     }
 
     function checkWin(player) {
-        var movesToCheck = player.getMoves();
-        movesToCheck.sort();
+        var copyOfMoves = playerOne.getMoves();
+        var movesToCheck = [];
+
+        for (var i = 0; i < copyOfMoves.length; i++) {
+            movesToCheck.push(copyOfMoves[i]);
+        }
+        
+
+        movesToCheck.sort(sortMoves);
 
         // Check all possibilities
+        // Start from the top left most move.
+        var move;
+        var firstSquareSelected = false;
+        var secondSquareSelected = false;
+        var thirdSquareSelected = false;
+        var fourthSquareSelected = false;
+        var fifthSqaureSelected = false;
+        var sixthSquareSelected = false;
+        var seventhSquareSelected = false;
+        var eighthSquareSelected = false;
+        var ninthSquareSelected = false;
+
+        while (movesToCheck.length > 0) {
+            move = movesToCheck.pop();
+
+            switch (move) {
+                case 1:
+                    firstSquareSelected = true;
+                    break;
+                case 2:
+                    secondSquareSelected = true;
+                    break;
+                case 3:
+                    thirdSquareSelected = true;
+                    break;
+                case 4:
+                    fourthSquareSelected = true;
+                    break;
+                case 5:
+                    fifthSqaureSelected = true;
+                    break;
+                case 6:
+                    sixthSquareSelected = true;
+                    break;
+                case 7:
+                    seventhSquareSelected = true;
+                    break;
+                case 8:
+                    eighthSquareSelected = true;
+                    break;
+                case 9:
+                    ninthSquareSelected = true;
+                    break;
+
+                default:
+                    console.log("Error checking the win condition");
+                    break;
+            }
+        }
+
+        if (firstSquareSelected) {
+            if (secondSquareSelected && thirdSquareSelected) {
+                return true;
+            } else if (fourthSquareSelected && seventhSquareSelected) {
+                return true;
+            } else if (fifthSqaureSelected && ninthSquareSelected) {
+                return true;
+            }
+        }
+
+        if (secondSquareSelected && fifthSqaureSelected && eighthSquareSelected) {
+            return true;
+        }
+
+        if (thirdSquareSelected) {
+            if (fifthSqaureSelected && seventhSquareSelected) {
+                return true;
+            }
+            if (sixthSquareSelected && ninthSquareSelected) {
+                return true;
+            }
+        }
+
+        if (fourthSquareSelected && fifthSqaureSelected && sixthSquareSelected) {
+            return true;
+        }
+
+        if (seventhSquareSelected && eighthSquareSelected && ninthSquareSelected) {
+            return true;
+        }
+
+        return false;
     }
 
 
