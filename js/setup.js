@@ -43,7 +43,8 @@ function AIPlayer(difficulty) {
             // Easy, random move
             let move = remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
             console.log(move);
-            remainingSquares.splice(move - 1, 1);
+            let position = remainingSquares.indexOf(move);
+            remainingSquares.splice(position, 1);
             return move;
         }
 
@@ -87,9 +88,10 @@ AIPlayer.prototype = new Player();
         addSquareSelect(square);
     }
 
-    function removeSquareFromRemaing(index) {
+    function removeSquareFromRemaing(playerMove) {
         // To DO fix shifting array
-        squaresRemaining.splice(index, 1);
+        let position = squaresRemaining.indexOf(playerMove);
+        squaresRemaining.splice(position, 1);
     }
 
     // Function to add square onclick events
@@ -138,8 +140,8 @@ AIPlayer.prototype = new Player();
             addSquareSelect(squares[i]);
             if (squares[i].hasClass("userChoice")) {
                 squares[i].removeClass("userChoice");
-            } else if (squares[i].hasClass("AIChoice")) {
-                squares[i].removeClass("AIChoice");
+            } else if (squares[i].hasClass("aiChoice")) {
+                squares[i].removeClass("aiChoice");
             }
         }
         
