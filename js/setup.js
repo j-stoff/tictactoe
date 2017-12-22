@@ -1,7 +1,16 @@
 // Player class
 function Player() {
+   this.name = "Player 1";
    this.isPlayerX = true;
    this.moves = [];
+
+   this.getName = function() {
+        return this.name;
+   }
+
+   this.setName = function(newName) {
+        this.name = newName;
+   }
 
    this.getPlayerSide = function() {
         return this.isPlayerX;
@@ -39,6 +48,8 @@ function AIPlayer(difficulty) {
             // Hard mode
         } else if (this.diff == 1) {
             // Normal
+            // Priotize the center, then corners
+            // Try to make 3
         } else {
             // Easy, random move
             let move = remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
@@ -77,6 +88,7 @@ AIPlayer.prototype = new Player();
     var playerOne = new Player();
     var AI = new AIPlayer(0);
     AI.changeSides();
+    AI.setName("AI");
 
     // Add squares to the game
     for(var index = 1; index < 10; index += 1) {
@@ -89,7 +101,6 @@ AIPlayer.prototype = new Player();
     }
 
     function removeSquareFromRemaing(playerMove) {
-        // To DO fix shifting array
         let position = squaresRemaining.indexOf(playerMove);
         squaresRemaining.splice(position, 1);
     }
@@ -109,13 +120,8 @@ AIPlayer.prototype = new Player();
             }
             */
             removeSquareFromRemaing(playerMove);
-            console.log("Squares remaing: " + squaresRemaining);
-            console.log("Player Move: " + playerMove);
             if (checkWin(playerOne)) {
-                instructionsDiv.text("You win! Hit reset to start a new game!");
-                for (var index = 0; index < squares.length; index += 1) {
-                    squares[index].off("click");
-                }
+                gameOver(playerOne);
                 console.log("Found a winner");
             } else {
                 $(document).off(event);
@@ -123,14 +129,25 @@ AIPlayer.prototype = new Player();
 
             if (AI) {
                 // TODO AI stuff
-                console.log("AI TURN");
                 let aiMove = AI.makeMove(squaresRemaining);
-                squares[aiMove - 1].addClass("aiChoice");
+                console.log("AI move: " + aiMove);
+                squares[aiMove - 1].addClass("aiChoice").off("click");
+                AI.addMove(aiMove);
+                if (checkWin(AI)) {
+                    gameOver(AI);
+                }
             }
         });
     }
 
     $("#TicTacToe").append(gameContainer);
+
+    function gameOver(player) {
+        instructionsDiv.text(player.getName() + " won! Hit reset to start a new game!");
+        for (var index = 0; index < squares.length; index += 1) {
+            squares[index].off("click");
+        }
+    }
 
     function resetAllSquares() {
         console.log("the right spot");
