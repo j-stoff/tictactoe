@@ -50,12 +50,28 @@ function AIPlayer(difficulty) {
             // Normal
             // Priotize the center, then corners
             // Try to make 3
+            console.log("making a hard decision");
+
+            // If the middle is not taken, do so
+            if (remainingSquares.includes(5)) {
+                removeSquareFromRemaing(5, remainingSquares);
+                return 5;
+            }
+
+            var move = findWinMove(this.moves, remainingSquares);
+
+            if (move == 0) {
+                move = randomMove(remainingSquares);
+            }
+
+            removeSquareFromRemaing(move, remainingSquares);
+            return move;
+
         } else {
             // Easy, random move
-            let move = remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
+            let move = randomMove(remainingSquares);
             console.log(move);
-            let position = remainingSquares.indexOf(move);
-            remainingSquares.splice(position, 1);
+            removeSquareFromRemaing(move, remainingSquares);
             return move;
         }
 
@@ -63,6 +79,106 @@ function AIPlayer(difficulty) {
 }
 
 AIPlayer.prototype = new Player();
+
+function randomMove(remainingSquares) {
+    return remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
+}
+
+function findWinMove(playerMoves, remainingSquares) {
+                // Check for win first
+            if (playerMoves.includes(1)) {
+
+                // Across
+                if (playerMoves.includes(2) && remainingSquares.includes(3)) {
+                    return 3;
+                }
+
+                //Across
+                if (playerMoves.includes(3) && remainingSquares.includes(2)) {
+                    return 2;
+                }
+
+                // Down
+                if (playerMoves.includes(4) && remainingSquares.includes(7)) {
+                    return 7;
+                }
+
+                // Down
+                if (playerMoves.includes(7) && remainingSquares.includes(4)) {
+                    return 4;
+                }
+
+                // Diagonal
+                if (playerMoves.includes(5) && remainingSquares.includes(9)) {
+                    return 9;
+                }
+
+                //Diagonal
+                if (playerMoves.includes(9) && remainingSquares.includes(5)) {
+                    return 5;
+                } 
+            }
+
+            if (playerMoves.includes(2)) {
+                if (playerMoves.includes(5) && remainingSquares.includes(8)) {
+                    return 8;
+                }
+
+                if (playerMoves.includes(8) && remainingSquares.includes(5)) {
+                    return 5;
+                }
+            }
+
+            if (playerMoves.includes(3)) {
+                if (playerMoves.includes(5) && remainingSquares.includes(7)) {
+                    return 7;
+                }
+
+                if (playerMoves.includes(7) && remainingSquares.includes(5)) {
+                    return 5;
+                }
+
+
+                if (playerMoves.includes(6) && remainingSquares.includes(9)) {
+                    return 9;
+                }
+
+                if (playerMoves.includes(9) && remainingSquares.includes(6)) {
+                    return 6;
+                }
+            }
+
+            if (playerMoves.includes(4)) {
+                if (playerMoves.includes(5) && remainingSquares.includes(6)) {
+                    return 6;
+                }
+
+                if (playerMoves.includes(6) && remainingSquares.includes(5)) {
+                    return 5;
+                }
+            }
+
+            if (playerMoves.includes(7)) {
+                if (playerMoves.includes(8) && remainingSquares.includes(9)) {
+                    return 9;
+                }
+
+                if (playerMoves.includes(9) && remainingSquares.includes(8)) {
+                    return 8;
+                }
+            }
+
+
+            return 0;
+
+}
+
+
+
+function removeSquareFromRemaing(playerMove, array) {
+    let position = array.indexOf(playerMove);
+    array.splice(position, 1);
+}
 
 // For creating the UI display
 (function() { 
@@ -86,7 +202,7 @@ AIPlayer.prototype = new Player();
     $("#TicTacToe").append(playerSideDiv);
 
     var playerOne = new Player();
-    var AI = new AIPlayer(0);
+    var AI = new AIPlayer(1);
     AI.changeSides();
     AI.setName("AI");
 
@@ -98,11 +214,6 @@ AIPlayer.prototype = new Player();
         squaresRemaining.push(index);
         gameContainer.append(square); 
         addSquareSelect(square);
-    }
-
-    function removeSquareFromRemaing(playerMove) {
-        let position = squaresRemaining.indexOf(playerMove);
-        squaresRemaining.splice(position, 1);
     }
 
     // Function to add square onclick events
@@ -119,15 +230,13 @@ AIPlayer.prototype = new Player();
                 instructionsDiv.text("X's player turn")
             }
             */
-            removeSquareFromRemaing(playerMove);
+            removeSquareFromRemaing(playerMove, squaresRemaining);
             if (checkWin(playerOne)) {
                 gameOver(playerOne);
                 console.log("Found a winner");
             } else {
                 $(document).off(event);
-            }
-
-            if (AI) {
+                if (AI) {
                 // TODO AI stuff
                 let aiMove = AI.makeMove(squaresRemaining);
                 console.log("AI move: " + aiMove);
@@ -136,6 +245,7 @@ AIPlayer.prototype = new Player();
                 if (checkWin(AI)) {
                     gameOver(AI);
                 }
+            }
             }
         });
     }
