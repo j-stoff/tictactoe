@@ -1,3 +1,57 @@
+// Player class
+function Player() {
+   this.isPlayerX = true;
+   this.moves = [];
+
+   this.getPlayerSide = function() {
+        return this.isPlayerX;
+   }
+
+   this.changeSides = function() {
+        if (this.isPlayerX) {
+            this.isPlayerX = false;
+        } else {
+            this.isPlayerX = true;
+        }
+   }
+
+   this.addMove = function(squareNumber) {
+        this.moves.push(squareNumber);
+   }
+
+   this.resetMoves = function() {
+        this.moves = [];
+   }
+
+   this.getMoves = function() {
+        return this.moves;
+   }
+}
+
+//AI class extends player
+function AIPlayer(difficulty) {
+    this.diff = difficulty;
+
+    this.makeMove = function(remainingSquares) {
+        console.log(remainingSquares);
+
+        if (this.diff == 2) {
+            // Hard mode
+        } else if (this.diff == 1) {
+            // Normal
+        } else {
+            // Easy, random move
+            let move = remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
+            console.log(move);
+            remainingSquares.splice(move - 1, 1);
+            return move;
+        }
+
+    }
+}
+
+AIPlayer.prototype = new Player();
+
 // For creating the UI display
 (function() { 
     $(document).ready(function() {
@@ -8,49 +62,19 @@
     var squares = [];
     var squareEvents = [];
     var gameContainer = $("<div>").addClass("gameContainer");
+    var squaresRemaining = [];
 
-    var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset");
-    var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls");
-    var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions");
-    var playerSideDiv = $("<div>").text("Playing as X's").addClass("playerSide");
+    var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset").addClass("topRow");
+    var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls").addClass("topRow");
+    var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions").addClass("topRow");
+    var playerSideDiv = $("<div>").text("Playing as X's").addClass("playerSide").addClass("topRow");
     $("#TicTacToe").append(resetButton);
     $("#TicTacToe").append(changeSidesButton);
     $("#TicTacToe").append(instructionsDiv);
     $("#TicTacToe").append(playerSideDiv);
 
-
-    // Player definition
-    function Player() {
-       this.isPlayerX = true;
-       this.moves = [];
-
-       this.getPlayerSide = function() {
-            return this.isPlayerX;
-       }
-
-       this.changeSides = function() {
-            if (this.isPlayerX) {
-                this.isPlayerX = false;
-            } else {
-                this.isPlayerX = true;
-            }
-       }
-
-       this.addMove = function(squareNumber) {
-            this.moves.push(squareNumber);
-       }
-
-       this.resetMoves = function() {
-            this.moves = [];
-       }
-
-       this.getMoves = function() {
-            return this.moves;
-       }
-    }
-
     var playerOne = new Player();
-    var AI = new Player();
+    var AI = new AIPlayer(0);
     AI.changeSides();
 
     // Add squares to the game
@@ -58,15 +82,22 @@
         var className = "box" + index;
         var square = $("<div>").addClass(className).attr("id", index);
         squares.push(square);
+        squaresRemaining.push(index);
         gameContainer.append(square); 
         addSquareSelect(square);
+    }
+
+    function removeSquareFromRemaing(index) {
+        // To DO fix shifting array
+        squaresRemaining.splice(index, 1);
     }
 
     // Function to add square onclick events
     function addSquareSelect(square) {
         square.on("click", function(event) {
             square.addClass("userChoice");
-            playerOne.addMove(Number.parseInt(this.id));
+            let playerMove = Number.parseInt(this.id);
+            playerOne.addMove(playerMove);
             /*
             // If two players, not sure if I will use.
             if (playerOne.getPlayerSide()) {
@@ -75,6 +106,9 @@
                 instructionsDiv.text("X's player turn")
             }
             */
+            removeSquareFromRemaing(playerMove);
+            console.log("Squares remaing: " + squaresRemaining);
+            console.log("Player Move: " + playerMove);
             if (checkWin(playerOne)) {
                 instructionsDiv.text("You win! Hit reset to start a new game!");
                 for (var index = 0; index < squares.length; index += 1) {
@@ -83,6 +117,13 @@
                 console.log("Found a winner");
             } else {
                 $(document).off(event);
+            }
+
+            if (AI) {
+                // TODO AI stuff
+                console.log("AI TURN");
+                let aiMove = AI.makeMove(squaresRemaining);
+                squares[aiMove - 1].addClass("aiChoice");
             }
         });
     }
@@ -104,10 +145,16 @@
         
     }
 
-    resetButton.on("click", function() {
+    function reset() {
         resetAllSquares();
         playerOne.resetMoves();
+        AI.resetMoves();
+        squaresRemaining = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         instructionsDiv.text("X player moves first");
+    }
+
+    resetButton.on("click", function() {
+        reset();
     });
 
     changeSidesButton.on("click", function() {
@@ -117,6 +164,7 @@
             playerSideDiv.text("Playing as X's");
         }
         playerOne.changeSides();
+        reset();
     });
 
 

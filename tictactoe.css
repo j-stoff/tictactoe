@@ -60,6 +60,10 @@
     grid-area: game;
 }
 
+.topRow {
+    margin: 10px;
+}
+
 .reset {
     grid-area: reset;
 }
@@ -91,4 +95,8 @@
 
 .userChoice {
     background-color: red;
+}
+
+.aiChoice {
+    background-color: blue;
 }
