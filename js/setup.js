@@ -41,16 +41,34 @@ function Player() {
 function AIPlayer(difficulty) {
     this.diff = difficulty;
 
-    this.makeMove = function(remainingSquares) {
-        console.log(remainingSquares);
+    this.makeMove = function(remainingSquares, opponentSquares) {
 
         if (this.diff == 2) {
             // Hard mode
+
+            // check win
+            var move = findWinMove(this.moves, remainingSquares);
+            if (move != 0) {
+                removeSquareFromRemaing(move, remainingSquares);
+                return move;
+            }
+            move = blockOpponentMove(opponentSquares, remainingSquares, this.moves);
+            if (move != 0) {
+                removeSquareFromRemaing(move, remainingSquares);
+                return move;
+            }
+            // block move
+            // goto corner
+            // random
+            move = randomMove(remainingSquares);
+            removeSquareFromRemaing(move, remainingSquares);
+            console.log(remainingSquares);
+            return move;
+
         } else if (this.diff == 1) {
             // Normal
             // Priotize the center, then corners
             // Try to make 3
-            console.log("making a hard decision");
 
             // If the middle is not taken, do so
             if (remainingSquares.includes(5)) {
@@ -82,6 +100,74 @@ AIPlayer.prototype = new Player();
 
 function randomMove(remainingSquares) {
     return remainingSquares[Math.floor(Math.random() * remainingSquares.length)];
+}
+
+function blockOpponentMove(opponentSquares, remainingSquares, aiMoves) {
+    if (opponentSquares.includes(1)) {
+        if (opponentSquares.includes(2) && remainingSquares.includes(3) && !aiMoves.includes(3)) {
+            return 3;
+        }
+        if (opponentSquares.includes(3) && remainingSquares.includes(2) && !aiMoves.includes(2)) {
+            return 2;
+        }
+        if (opponentSquares.includes(4) && remainingSquares.includes(7) && !aiMoves.includes(7)) {
+            return 7;
+        }
+        if (opponentSquares.includes(7) && remainingSquares.includes(4) && !aiMoves.includes(4)) {
+            return 4;
+        }
+        if (opponentSquares.includes(5) && remainingSquares.includes(9) && !aiMoves.includes(9)) {
+            return 9;
+        }
+        if (opponentSquares.includes(9) && remainingSquares.includes(5) && !aiMoves.includes(5)) {
+            return 5;
+        }
+    }
+
+
+    if (opponentSquares.includes(2)) {
+        if (opponentSquares.includes(5) && remainingSquares.includes(8)) {
+            return 8;
+        }
+        if (opponentSquares.includes(8) && remainingSquares.includes(5)) {
+            return 5;
+        }
+    }
+
+    if (opponentSquares.includes(3)) {
+        if (opponentSquares.includes(5) && remainingSquares.includes(7)) {
+            return 7;
+        }
+        if (opponentSquares.includes(7) && remainingSquares.includes(5)) {
+            return 5;
+        }
+        if (opponentSquares.includes(6) && remainingSquares.includes(9)) {
+            return 9;
+        }
+        if (opponentSquares.includes(9) && remainingSquares.includes(6)) {
+            return 6;
+        }
+    }
+
+    if (opponentSquares.includes(4)) {
+        if (opponentSquares.includes(5) && remainingSquares.includes(6)) {
+            return 6;
+        }
+        if (opponentSquares.includes(6) && remainingSquares.includes(5)) {
+            return 5;
+        }
+    }
+
+    if (opponentSquares.includes(7)) {
+        if (opponentSquares.includes(8) && remainingSquares.includes(9)) {
+            return 9;
+        }
+        if (opponentSquares.includes(9) && remainingSquares.includes(8)) {
+            return 8;
+        }
+    }
+
+    return 0;
 }
 
 function findWinMove(playerMoves, remainingSquares) {
@@ -202,10 +288,10 @@ function removeSquareFromRemaing(playerMove, array) {
     $("#TicTacToe").append(playerSideDiv);
 
     var playerOne = new Player();
-    var AI = new AIPlayer(1);
+    var AI = new AIPlayer(2);
     AI.changeSides();
     AI.setName("AI");
-
+    
     // Add squares to the game
     for(var index = 1; index < 10; index += 1) {
         var className = "box" + index;
@@ -238,7 +324,7 @@ function removeSquareFromRemaing(playerMove, array) {
                 $(document).off(event);
                 if (AI) {
                 // TODO AI stuff
-                let aiMove = AI.makeMove(squaresRemaining);
+                let aiMove = AI.makeMove(squaresRemaining, playerOne.getMoves());
                 console.log("AI move: " + aiMove);
                 squares[aiMove - 1].addClass("aiChoice").off("click");
                 AI.addMove(aiMove);
@@ -299,6 +385,7 @@ function removeSquareFromRemaing(playerMove, array) {
 
     function checkWin(player) {
         var movesToCheck = player.getMoves();
+        console.log("Moves: " + movesToCheck);
 
         if (movesToCheck.includes(1)) {
             if (movesToCheck.includes(2) && movesToCheck.includes(3)) {
@@ -310,10 +397,12 @@ function removeSquareFromRemaing(playerMove, array) {
             if (movesToCheck.includes(5) && movesToCheck.includes(9)) {
                 return true;
             }
-        } else if (movesToCheck.includes(2) && movesToCheck.includes(5)
+        } 
+        if (movesToCheck.includes(2) && movesToCheck.includes(5)
                 && movesToCheck.includes(8)) {
             return true;
-        } else if (movesToCheck.includes(3)) {
+        }
+        if (movesToCheck.includes(3)) {
             if (movesToCheck.includes(5) && movesToCheck.includes(7)) {
                 return true;
             }
@@ -321,11 +410,13 @@ function removeSquareFromRemaing(playerMove, array) {
             if (movesToCheck.includes(6) && movesToCheck.includes(9)) {
                 return true;
             }
-        } else if (movesToCheck.includes(4)) {
+        }
+        if (movesToCheck.includes(4)) {
             if (movesToCheck.includes(5) && movesToCheck.includes(6)) {
                 return true;
             }
-        } else if (movesToCheck.includes(7)) {
+        }
+        if (movesToCheck.includes(7)) {
             if (movesToCheck.includes(8) && movesToCheck.includes(9)) {
                 return true;
             }
