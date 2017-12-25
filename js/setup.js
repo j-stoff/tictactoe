@@ -57,6 +57,16 @@ function AIPlayer(difficulty) {
                 removeSquareFromRemaing(move, remainingSquares);
                 return move;
             }
+            if (remainingSquares.includes(5)) {
+                removeSquareFromRemaing(5, remainingSquares);
+                return 5;
+            }
+
+            move = takeCornerSquare(this.moves, remainingSquares);
+            if (move != 0) {
+                removeSquareFromRemaing(move, remainingSquares);
+                return move;
+            }
             // block move
             // goto corner
             // random
@@ -209,6 +219,34 @@ function blockOpponentMove(opponentSquares, remainingSquares, aiMoves) {
     return 0;
 }
 
+function cornerHelper(firstSquareOwned, secondSquareOwned, openSquareOne, openSquareTwo, playerMoves, remainingSquares) {
+    if (playerMoves.includes(firstSquareOwned) && playerMoves.includes(secondSquareOwned)
+            && remainingSquares.includes(openSquareOne) && remainingSquares.includes(openSquareTwo)) {
+        return true;
+    }
+
+    return false;
+}
+
+function takeCornerSquare(playerMoves, remainingSquares, opponentSquares) {
+    if (remainingSquares.includes(1)) {
+        if (cornerHelper(5, 2, 3, 9, playerMoves, remainingSquares)) {
+            return 1;
+        }
+
+        if (cornerHelper(5, 4, 9, 6, playerMoves, remainingSquares)) {
+            return 1;
+        }
+
+        if (playerMoves.includes(2) && playerMoves.includes(4)
+                && remainingSquares.includes(3) && remainingSquares.includes(6)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 function findWinMove(playerMoves, remainingSquares) {
                 // Check for win first
             if (playerMoves.includes(1)) {
@@ -327,7 +365,7 @@ function removeSquareFromRemaing(playerMove, array) {
     $("#TicTacToe").append(playerSideDiv);
 
     var playerOne = new Player();
-    var AI = new AIPlayer(0);
+    var AI = new AIPlayer(2);
     AI.changeSides();
     AI.setName("AI");
     
