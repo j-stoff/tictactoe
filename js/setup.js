@@ -62,7 +62,6 @@ function AIPlayer(difficulty) {
             // random
             move = randomMove(remainingSquares);
             removeSquareFromRemaing(move, remainingSquares);
-            console.log(remainingSquares);
             return move;
 
         } else if (this.diff == 1) {
@@ -103,6 +102,7 @@ function randomMove(remainingSquares) {
 }
 
 function blockOpponentMove(opponentSquares, remainingSquares, aiMoves) {
+    // TODO include all possibilities, not just starting from the top left.
     if (opponentSquares.includes(1)) {
         if (opponentSquares.includes(2) && remainingSquares.includes(3) && !aiMoves.includes(3)) {
             return 3;
@@ -158,6 +158,37 @@ function blockOpponentMove(opponentSquares, remainingSquares, aiMoves) {
         }
     }
 
+    if (opponentSquares.includes(5)) {
+        if (opponentSquares.includes(4) && remainingSquares.includes(6)) {
+            return 6;
+        }
+
+        if (opponentSquares.includes(6) && remainingSquares.includes(4)) {
+            return 4;
+        }
+
+        if (opponentSquares.includes(2) && remainingSquares.includes(8)) {
+            return 8;
+        }
+
+        if (opponentSquares.includes(8) && remainingSquares.includes(2)) {
+            return 2;
+        }
+
+        if (opponentSquares.includes(9) && remainingSquares.includes(1)) {
+            return 1;
+        }
+        if (opponentSquares.includes(7) && remainingSquares.includes(3)){
+            return 3;
+        }
+    }
+
+    if (opponentSquares.includes(6)) {
+        if (opponentSquares.includes(9) && remainingSquares.includes(3)) {
+            return 3;
+        }
+    }
+
     if (opponentSquares.includes(7)) {
         if (opponentSquares.includes(8) && remainingSquares.includes(9)) {
             return 9;
@@ -166,6 +197,14 @@ function blockOpponentMove(opponentSquares, remainingSquares, aiMoves) {
             return 8;
         }
     }
+
+    if (opponentSquares.includes(9)) {
+        if (opponentSquares.includes(7) && remainingSquares.includes(8)) {
+            return 8;
+        }
+    }
+
+    console.log("No block available");
 
     return 0;
 }
@@ -288,7 +327,7 @@ function removeSquareFromRemaing(playerMove, array) {
     $("#TicTacToe").append(playerSideDiv);
 
     var playerOne = new Player();
-    var AI = new AIPlayer(2);
+    var AI = new AIPlayer(0);
     AI.changeSides();
     AI.setName("AI");
     
@@ -317,19 +356,21 @@ function removeSquareFromRemaing(playerMove, array) {
             }
             */
             removeSquareFromRemaing(playerMove, squaresRemaining);
-            if (checkWin(playerOne)) {
-                gameOver(playerOne);
+
+            if (squaresRemaining.length === 0) {
+                instructionsDiv.text("Tie! Press reset to restart");               
+            } else if (checkWin(playerOne)) {
+                winGame(playerOne);
                 console.log("Found a winner");
             } else {
                 $(document).off(event);
                 if (AI) {
                 // TODO AI stuff
                 let aiMove = AI.makeMove(squaresRemaining, playerOne.getMoves());
-                console.log("AI move: " + aiMove);
                 squares[aiMove - 1].addClass("aiChoice").off("click");
                 AI.addMove(aiMove);
                 if (checkWin(AI)) {
-                    gameOver(AI);
+                    winGame(AI);
                 }
             }
             }
@@ -338,7 +379,7 @@ function removeSquareFromRemaing(playerMove, array) {
 
     $("#TicTacToe").append(gameContainer);
 
-    function gameOver(player) {
+    function winGame(player) {
         instructionsDiv.text(player.getName() + " won! Hit reset to start a new game!");
         for (var index = 0; index < squares.length; index += 1) {
             squares[index].off("click");
@@ -346,7 +387,6 @@ function removeSquareFromRemaing(playerMove, array) {
     }
 
     function resetAllSquares() {
-        console.log("the right spot");
         // TODO jquery has a way to find out if an object has a click event attached to it already
         for (var i = 0; i < squares.length; i++) {
             squares[i].off("click");
@@ -385,7 +425,6 @@ function removeSquareFromRemaing(playerMove, array) {
 
     function checkWin(player) {
         var movesToCheck = player.getMoves();
-        console.log("Moves: " + movesToCheck);
 
         if (movesToCheck.includes(1)) {
             if (movesToCheck.includes(2) && movesToCheck.includes(3)) {
