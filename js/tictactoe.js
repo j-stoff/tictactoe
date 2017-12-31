@@ -2,10 +2,11 @@
 (function() { 
     $(document).ready(function() {
         // Player class
-        function Player(name, isXSide) {
+        function Player(name, isXSide, playerClass) {
            this.name = name;
            this.isPlayerX = isXSide;
            this.moves = [];
+           this.playerClass = playerClass;
 
            this.getName = function() {
                 return this.name;
@@ -42,15 +43,26 @@
            this.getMoves = function() {
                 return this.moves;
            }
+
+           this.getPlayerClass = function() {
+                return this.playerClass;
+           }
+
+           this.setPlayerClass = function(newClass) {
+                this.playerClass = newClass;
+           }
         }
 
         //AI class extends player
-        function AIPlayer(difficulty) {
+        function AIPlayer(difficulty, name, isPlayerX, playerClass) {
             this.diff = difficulty;
             this.opponentMoves;
             this.openSpaces;
 
-            this.makeMove = function() {
+            Player.call(this, name, isPlayerX, playerClass);
+
+            // TODO expand difficulty, maybe have a cool algorithm
+            this.makeMove = function(game) {
                 // The big function
                 if (this.diff === 2) {
 
@@ -58,7 +70,8 @@
 
                 } else {
                     let move = this.randomMove();
-                    removeSquareFromRemaing(move, this.openSpaces);
+                    this.addMove(move);
+                    game.addClassToSquare(move, this.playerClass);
                     return move;
                 }
             }
@@ -89,10 +102,11 @@
             }
 
         }
-        AIPlayer.prototype = new Player();
+        AIPlayer.prototype = Object.create(Player.prototype);
+        AIPlayer.prototype.constructor = AIPlayer;
 
 
-        function Game() {
+        function Game(messageContainer) {
             this.players = [];
             this.gameOver = false;
             this.squareObjects = [];
@@ -108,6 +122,8 @@
             this.winConditions = [topRow, middleRow, bottomRow, leftColumn, 
                     middleColumn, rightColumn, diagonalTopToBottom,
                     diagonalBottomToTop];
+            this.messageDiv = messageContainer;
+            this.isGameOver = false;
 
             this.addPlayer = function(player) {
                 this.players.push(player);
@@ -153,10 +169,12 @@
                 instructionsDiv.text("X player moves first");
 
                 // If AI is X, move first.
-                // TODO
+                // TODO AI moves first when player is O
                 if (AI.getIsXPlayer() === true) {
                     console.log("AI move");
                 }
+
+                this.isGameOver = false;
             }
 
             this.checkGameOver = function(player) {
@@ -176,14 +194,16 @@
                 }
 
                 if (success) {
-                    return true;
+                    this.isGameOver = true;
+                    this.disableAllSquares();
+                    this.messageDiv.text(player.getName() + " has won! Press reset to restart the game");
                 }
                 // check if squares remainining is 0
                 if (this.openSpaces.length === 0) {
-                    return true;
+                    this.isGameOver = true;
+                    this.disableAllSquares();
+                    this.messageDiv.text("Tie! Press reset to restart the game.");
                 }
-
-                return false;
             }
 
             this.removeSquareFromOpenSpace = function(move) {
@@ -197,10 +217,27 @@
                 }
             }
 
+            this.disableSquare = function(squareNumber) {
+                this.squareObjects[squareNumber - 1].off("click");
+            }
+
             this.swapSides = function() {
                 for (var i = this.players.length - 1; i >= 0; i--) {
                     this.players[i].changeSides();
                 }
+            }
+
+            this.addClassToSquare = function(squareNumber, playerClass) {
+                this.squareObjects[squareNumber - 1].addClass(playerClass);
+            }
+
+            this.takeTurn = function(move) {
+                this.removeSquareFromOpenSpace(move);
+                this.disableSquare(move);
+            }
+
+            this.getGameState = function() {
+                return this.isGameOver;
             }
         }
 
@@ -220,14 +257,12 @@
         $("#TicTacToe").append(instructionsDiv);
         $("#TicTacToe").append(playerSideDiv);
 
-        var playerOne = new Player("Player 1", true);
-        var AI = new AIPlayer(0);
-        AI.setIsXPlayer(false);
-        var game = new Game();
+        var playerOne = new Player("Player 1", true, "userChoice");
+        var AI = new AIPlayer(0, "AI", false, "aiChoice");
+        var game = new Game(instructionsDiv);
         game.addPlayer(playerOne);
         game.addPlayer(AI);
-        AI.setName("AI");
-        AI.setOpenSpaces(game.getOpenSpaces);
+        AI.setOpenSpaces(game.getOpenSpaces());
         AI.setOpponentMoves(playerOne.getMoves());
        
         // Add squares to the game
@@ -239,60 +274,18 @@
             gameContainer.append(square); 
             addSquareSelect(square);
         }
-
-        // Have the AI take it's turn. Can be done before adding click events.
-        // TODO
-        if (AI.getIsXPlayer() === true) {
-            // AI is X, move first
-            console.log("First move to the AI");
-        }
         // Function to add square onclick events
         function addSquareSelect(square) {
             square.on("click", function(event) {
                 square.addClass("userChoice");
                 let playerMove = Number.parseInt(this.id);
                 playerOne.addMove(playerMove);
-                game.removeSquareFromOpenSpace(playerMove);
-                console.log(game.getOpenSpaces());
-                if (game.checkGameOver(playerOne)) {
-                    // change text to who won
-                    game.disableAllSquares();
-                    instructionsDiv.text("Player 1 wins! Press restart to play again");
-                } else {
-                    // AI takes it's turn
+                game.takeTurn(playerMove);
+                game.checkGameOver(playerOne);
+                if (game.getGameState() == false) {
+                    game.takeTurn(AI.makeMove(game));
+                    game.checkGameOver(AI);
                 }
-                /*
-                // If two players, not sure if I will use.
-                if (playerOne.getIsXPlayer()) {
-                    instructionsDiv.text("O's player turn");
-                } else {
-                    instructionsDiv.text("X's player turn")
-                }
-                */
-
-                /*
-                removeSquareFromRemaing(playerMove, squaresRemaining);
-                
-                if (squaresRemaining.length === 0) {
-                   instructionsDiv.text("Tie! Press reset to restart");               
-                } else 
-                if (checkWin(playerOne)) {
-                    winGame(playerOne);
-                    console.log("Found a winner");
-                } else {
-                    $(document).off(event);
-                    if (AI) {
-                    // TODO AI stuff
-                    let aiMove = AI.makeMove(game.getOpenSpaces(), playerOne.getMoves());
-                    squares[aiMove - 1].addClass("aiChoice").off("click");
-                    AI.addMove(aiMove);
-                    console.log(AI.getOpenSpaces());
-                    if (checkWin(AI)) {
-                        winGame(AI);
-                    }
-                }
-                }
-                */
             });
         }
 
