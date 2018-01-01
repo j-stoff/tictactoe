@@ -65,15 +65,73 @@
             this.makeMove = function(game) {
                 // The big function
                 if (this.diff === 2) {
+                    // Goes middle if second, goes corner if first
+                    let openSpaces = game.getOpenSpaces();
+                    if (!this.isPlayerX && openSpaces.includes(5)) {
+                        this.moveCleanUp(5, game);
+                        return 5;
+                    }
 
+                    let cornerMoves = this.makeCornerArray(openSpaces);
+                    var move;
+
+                    move = this.winMove(game);
+
+                    // Wins game if possible
+                    if (move != 0) {
+                        this.moveCleanUp(move, game);
+                        return move;
+                    }
+
+                    // block move
+
+                    move = this.blockMove();
+                    if (move != 0) {
+                        this;moveCleanUp(move, game);
+                        return move;
+                    }
+
+                    // Prioritize corners
+                    if (cornerMoves.length > 1) {
+                        move = cornerMoves[Math.floor(Math.random() * cornerMoves.length)];
+                        this.moveCleanUp(move, game);
+                        return move;
+                    }
+
+                    // random move
+                    move = this.randomMove();
+                    this.moveCleanUp(move, game);
+
+                    return move;
                 } else if (this.diff === 1) {
+                    // Goes to the middle if open
+                    // Tries to win
+                    // random move
+                    if (game.getOpenSpaces().includes(5)) {
+                        this.moveCleanUp(5, game);
+                        return 5;
+                    }
+                    var move = this.winMove(game);
+
+                    if (move != 0) {
+                        this.moveCleanUp(move, game);
+                        return move;
+                    }
+
+                    move = this.randomMove();
+                    this.moveCleanUp(move, game);
+                    return move;
 
                 } else {
                     let move = this.randomMove();
-                    this.addMove(move);
-                    game.addClassToSquare(move, this.playerClass);
+                    this.moveCleanUp(move, game);
                     return move;
                 }
+            }
+
+            this.moveCleanUp = function(move, game) {
+                this.addMove(move);
+                game.addClassToSquare(move, this.playerClass);
             }
 
             this.setOpponentMoves = function(opponentSquares) {
@@ -89,13 +147,144 @@
 
             // Private methods
             this.blockMove = function() {
-
+                // TODO pick up tomorrow
+                return 0;
             }
-            this.cornerMove = function() {
 
+            this.makeCornerArray = function(spaces) {
+                let corners = [];
+                if (spaces.includes(1)) {
+                    corners.push(1);
+                }
+                if (spaces.includes(3)) {
+                    corners.push(3);
+                }
+
+                if (spaces.includes(7)) {
+                    corners.push(7);
+                }
+
+                if (spaces.includes(9)) {
+                    corners.push(9);
+                }
+
+                return corners;
             }
-            this.winMove = function() {
 
+            this.winMove = function(game) {
+                let localOpenSpaces = game.getOpenSpaces();
+                
+                for (var i = localOpenSpaces.length - 1; i >= 0; i--) {
+                    switch (localOpenSpaces[i]) {
+                        case 1:
+                                if (this.moves.includes(2) && this.moves.includes(3)) {
+                                    return 1;
+                                }
+
+                                if (this.moves.includes(4) && this.moves.includes(7)) {
+                                    return 1;
+                                }
+
+                                if (this.moves.includes(5) && this.moves.includes(9)) {
+                                    return 1;
+                                }
+                                break;
+                        case 2:
+                                if (this.moves.includes(1) && this.moves.includes(3)) {
+                                    return 2;
+                                }
+
+                                if (this.moves.includes(5) && this.moves.includes(8)) {
+                                    return 2;
+                                }
+                                break;
+                        case 3:
+                                if (this.moves.includes(1) && this.moves.includes(2)) {
+                                    return 3;
+                                }
+                                if (this.moves.includes(5) && this.moves.includes(7)) {
+                                    return 3;
+                                }
+
+                                if (this.moves.includes(6) && this.moves.includes(9)) {
+                                    return 3;
+                                }
+                                break;
+                        case 4:
+                                if (this.moves.includes(1) && this.moves.includes(7)) {
+                                    return 4;
+                                }
+
+                                if (this.moves.includes(5) && this.moves.includes(6)) {
+                                    return 4;
+                                }
+                                break;
+                        case 5:
+                                if (this.moves.includes(1) && this.moves.includes(9)) {
+                                    return 5;
+                                }
+
+                                if (this.moves.includes(2) && this.moves.includes(8)) {
+                                    return 5;
+                                }
+
+                                if (this.moves.includes(3) && this.moves.includes(7)) {
+                                    return 5;
+                                }
+
+                                if (this.moves.includes(4) && this.moves.includes(6)) {
+                                    return 5;
+                                }
+
+                                break;
+                        case 6:
+                                if (this.moves.includes(3) && this.moves.includes(9)) {
+                                    return 6;
+                                }
+
+                                if (this.moves.includes(4) && this.moves.includes(5)) {
+                                    return 6;
+                                }
+                                break;
+                        case 7:
+                                if (this.moves.includes(1) && this.moves.includes(4)) {
+                                    return 7;
+                                }
+                                if (this.moves.includes(5) && this.moves.includes(3)) {
+                                    return 7;
+                                }
+                                if (this.moves.includes(8) && this.moves.includes(9)) {
+                                    return 7;
+                                }
+                                break;
+                        case 8:
+                                if (this.moves.includes(5) && this.moves.includes(2)) {
+                                    return 8;
+                                }
+                                if (this.moves.includes(7) && this.moves.includes(9)) {
+                                    return 8;
+                                }
+                                break;
+                        case 9:
+                                if (this.moves.includes(1) && this.moves.includes(5)) {
+                                    return 9;
+                                }
+
+                                if (this.moves.includes(7) && this.moves.includes(8)) {
+                                    return 9;
+                                }
+
+                                if (this.moves.includes(3) && this.moves.includes(6)) {
+                                    return 9;
+                                }
+                                break;
+                        default:
+                                return 0;
+                    }
+                }
+                
+                console.log("none found");
+                return 0;
             }
             this.randomMove = function() {
                 return this.openSpaces[Math.floor(Math.random() * this.openSpaces.length)];
@@ -258,7 +447,7 @@
         $("#TicTacToe").append(playerSideDiv);
 
         var playerOne = new Player("Player 1", true, "userChoice");
-        var AI = new AIPlayer(0, "AI", false, "aiChoice");
+        var AI = new AIPlayer(2, "AI", false, "aiChoice");
         var game = new Game(instructionsDiv);
         game.addPlayer(playerOne);
         game.addPlayer(AI);
