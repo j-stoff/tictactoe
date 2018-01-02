@@ -78,20 +78,25 @@
 
                     // Wins game if possible
                     if (move != 0) {
+                        console.log("Win move: " + move);
                         this.moveCleanUp(move, game);
                         return move;
                     }
+
 
                     // block move
                     move = this.selectedMove(this.opponentMoves);
                     if (move != 0) {
+                        console.log("block move: " + move);
                         this.moveCleanUp(move, game);
                         return move;
                     }
 
+
                     // Prioritize corners
                     if (cornerMoves.length > 1) {
                         move = cornerMoves[Math.floor(Math.random() * cornerMoves.length)];
+                        console.log("corner move: " + move);
                         this.moveCleanUp(move, game);
                         return move;
                     }
@@ -132,6 +137,10 @@
                 game.addClassToSquare(move, this.playerClass);
             }
 
+            this.getOpponentMoves = function() {
+                return this.opponentMoves;
+            }
+
             this.setOpponentMoves = function(opponentSquares) {
                 this.opponentMoves = opponentSquares;
             }
@@ -165,6 +174,7 @@
             }
 
             this.selectedMove = function(setOfMoves) {
+                console.log(setOfMoves);
                 for (var i = this.openSpaces.length - 1; i >= 0; i--) {
                     switch (this.openSpaces[i]) {
                         case 1:
@@ -287,6 +297,7 @@
 
         function Game(messageContainer) {
             this.players = [];
+            this.AIPlayer;
             this.gameOver = false;
             this.squareObjects = [];
             this.openSpaces = [];
@@ -329,14 +340,15 @@
                 for (var i = 0; i < this.squareObjects.length; i++) {
                     this.squareObjects[i].off("click");
                     addSquareSelect(this.squareObjects[i]);
-                    if (this.squareObjects[i].hasClass("userChoice")) {
-                        this.squareObjects[i].removeClass("userChoice");
-                    } else if (this.squareObjects[i].hasClass("aiChoice")) {
-                        this.squareObjects[i].removeClass("aiChoice");
+                    if (this.squareObjects[i].hasClass("xChoice")) {
+                        this.squareObjects[i].removeClass("xChoice");
+                    } else if (this.squareObjects[i].hasClass("oChoice")) {
+                        this.squareObjects[i].removeClass("oChoice");
                     }
                 }
                 for (var i = 0; i < this.players.length; i++) {
                     this.players[i].resetMoves();
+                    console.log(this.players[i].getName() + this.players[i].getMoves());
                 }
                 let spacesLeft = this.openSpaces.length;
                 for (var i = 0; i < spacesLeft; i++) {
@@ -354,6 +366,9 @@
                 }
 
                 this.isGameOver = false;
+
+                this.AIPlayer.setOpponentMoves(this.players[0].getMoves());
+                console.log(this.AIPlayer.getOpponentMoves());
             }
 
             this.checkGameOver = function(player) {
@@ -383,6 +398,10 @@
                     this.disableAllSquares();
                     this.messageDiv.text("Tie! Press reset to restart the game.");
                 }
+            }
+
+            this.setAI = function(AI) {
+                this.AIPlayer = AI;
             }
 
             this.removeSquareFromOpenSpace = function(move) {
@@ -420,12 +439,16 @@
             }
         }
 
-        let size = 1;   // Will be abstracted out eventually.
-        let side = 400;
-        let width = size * side;
-        let height = size * side;
+        // Sizes
+        // 500
+        // 700
+        // 900 
+        let side = 500;
+        let width = side;
+        let height = side;
         var squareEvents = [];
-        var gameContainer = $("<div>").addClass("gameContainer");
+        $("#TicTacToe").css("width", width).css("height", height);
+        var gameContainer = $("<div>").addClass("gameContainer").css("width", width).css("height", height);
 
         var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset").addClass("topRow");
         var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls").addClass("topRow");
@@ -436,11 +459,12 @@
         $("#TicTacToe").append(instructionsDiv);
         $("#TicTacToe").append(playerSideDiv);
 
-        var playerOne = new Player("Player 1", true, "userChoice");
-        var AI = new AIPlayer(2, "AI", false, "aiChoice");
+        var playerOne = new Player("Player 1", true, "xChoice");
+        var AI = new AIPlayer(2, "AI", false, "oChoice");
         var game = new Game(instructionsDiv);
         game.addPlayer(playerOne);
         game.addPlayer(AI);
+        game.setAI(AI);
         AI.setOpenSpaces(game.getOpenSpaces());
         AI.setOpponentMoves(playerOne.getMoves());
        
@@ -456,7 +480,7 @@
         // Function to add square onclick events
         function addSquareSelect(square) {
             square.on("click", function(event) {
-                square.addClass("userChoice");
+                square.addClass(playerOne.getPlayerClass());
                 let playerMove = Number.parseInt(this.id);
                 playerOne.addMove(playerMove);
                 game.takeTurn(playerMove);
@@ -470,37 +494,6 @@
 
 
         $("#TicTacToe").append(gameContainer);
-        /*
-        function removeClickFromAllSquares() {
-            // TODO jquery has a way to find out if an object has a click event attached to it already
-            for (var i = 0; i < squares.length; i++) {
-                squares[i].off("click");
-                addSquareSelect(squares[i]);
-                if (squares[i].hasClass("userChoice")) {
-                    squares[i].removeClass("userChoice");
-                } else if (squares[i].hasClass("aiChoice")) {
-                    squares[i].removeClass("aiChoice");
-                }
-            }
-            
-        }
-        */
-
-        /*
-        function reset() {
-            resetAllSquares();
-            playerOne.resetMoves();
-            AI.resetMoves();
-            let spacesLeft = squaresRemaining.length;
-            for (var i = 0; i < spacesLeft; i++) {
-                squaresRemaining.pop();
-            }
-            for (var i = 1; i < 10; i++) {
-                squaresRemaining.push(i);
-            }
-            instructionsDiv.text("X player moves first");
-        }
-        */
 
         resetButton.on("click", function() {
             game.reset();

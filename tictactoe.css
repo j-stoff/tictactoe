@@ -93,10 +93,18 @@
     grid-column-gap: 20px;
 }
 
-.userChoice {
-    background-color: red;
+.xChoice {
+    background-image: url("images/x-img.png");
 }
 
-.aiChoice {
-    background-color: blue;
+.oChoice {
+    background-image: url("images/o-img.png");
+}
+
+.xWin {
+    background-image: url("images/x-win.png");
+}
+
+.oWin {
+    background-image: url("images/o-win.png");
 }
