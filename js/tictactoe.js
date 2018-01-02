@@ -66,16 +66,15 @@
                 // The big function
                 if (this.diff === 2) {
                     // Goes middle if second, goes corner if first
-                    let openSpaces = game.getOpenSpaces();
-                    if (!this.isPlayerX && openSpaces.includes(5)) {
+                    if (!this.isPlayerX && this.openSpaces.includes(5)) {
                         this.moveCleanUp(5, game);
                         return 5;
                     }
 
-                    let cornerMoves = this.makeCornerArray(openSpaces);
+                    let cornerMoves = this.makeCornerArray();
                     var move;
 
-                    move = this.winMove(game);
+                    move = this.selectedMove(this.moves);
 
                     // Wins game if possible
                     if (move != 0) {
@@ -84,10 +83,9 @@
                     }
 
                     // block move
-
-                    move = this.blockMove();
+                    move = this.selectedMove(this.opponentMoves);
                     if (move != 0) {
-                        this;moveCleanUp(move, game);
+                        this.moveCleanUp(move, game);
                         return move;
                     }
 
@@ -107,11 +105,11 @@
                     // Goes to the middle if open
                     // Tries to win
                     // random move
-                    if (game.getOpenSpaces().includes(5)) {
+                    if (this.openSpaces.includes(5)) {
                         this.moveCleanUp(5, game);
                         return 5;
                     }
-                    var move = this.winMove(game);
+                    var move = this.selectedMove(this.openSpaces);
 
                     if (move != 0) {
                         this.moveCleanUp(move, game);
@@ -146,135 +144,128 @@
             }
 
             // Private methods
-            this.blockMove = function() {
-                // TODO pick up tomorrow
-                return 0;
-            }
-
-            this.makeCornerArray = function(spaces) {
+            this.makeCornerArray = function() {
                 let corners = [];
-                if (spaces.includes(1)) {
+                if (this.openSpaces.includes(1)) {
                     corners.push(1);
                 }
-                if (spaces.includes(3)) {
+                if (this.openSpaces.includes(3)) {
                     corners.push(3);
                 }
 
-                if (spaces.includes(7)) {
+                if (this.openSpaces.includes(7)) {
                     corners.push(7);
                 }
 
-                if (spaces.includes(9)) {
+                if (this.openSpaces.includes(9)) {
                     corners.push(9);
                 }
 
                 return corners;
             }
 
-            this.winMove = function(game) {
-                let localOpenSpaces = game.getOpenSpaces();
-                
-                for (var i = localOpenSpaces.length - 1; i >= 0; i--) {
-                    switch (localOpenSpaces[i]) {
+            this.selectedMove = function(setOfMoves) {
+                for (var i = this.openSpaces.length - 1; i >= 0; i--) {
+                    switch (this.openSpaces[i]) {
                         case 1:
-                                if (this.moves.includes(2) && this.moves.includes(3)) {
+                                if (setOfMoves.includes(2) && setOfMoves.includes(3)) {
                                     return 1;
                                 }
 
-                                if (this.moves.includes(4) && this.moves.includes(7)) {
+                                if (setOfMoves.includes(4) && setOfMoves.includes(7)) {
                                     return 1;
                                 }
 
-                                if (this.moves.includes(5) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(9)) {
                                     return 1;
                                 }
                                 break;
                         case 2:
-                                if (this.moves.includes(1) && this.moves.includes(3)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(3)) {
                                     return 2;
                                 }
 
-                                if (this.moves.includes(5) && this.moves.includes(8)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(8)) {
                                     return 2;
                                 }
                                 break;
                         case 3:
-                                if (this.moves.includes(1) && this.moves.includes(2)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(2)) {
                                     return 3;
                                 }
-                                if (this.moves.includes(5) && this.moves.includes(7)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(7)) {
                                     return 3;
                                 }
 
-                                if (this.moves.includes(6) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(6) && setOfMoves.includes(9)) {
                                     return 3;
                                 }
                                 break;
                         case 4:
-                                if (this.moves.includes(1) && this.moves.includes(7)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(7)) {
                                     return 4;
                                 }
 
-                                if (this.moves.includes(5) && this.moves.includes(6)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(6)) {
                                     return 4;
                                 }
                                 break;
                         case 5:
-                                if (this.moves.includes(1) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(9)) {
                                     return 5;
                                 }
 
-                                if (this.moves.includes(2) && this.moves.includes(8)) {
+                                if (setOfMoves.includes(2) && setOfMoves.includes(8)) {
                                     return 5;
                                 }
 
-                                if (this.moves.includes(3) && this.moves.includes(7)) {
+                                if (setOfMoves.includes(3) && setOfMoves.includes(7)) {
                                     return 5;
                                 }
 
-                                if (this.moves.includes(4) && this.moves.includes(6)) {
+                                if (setOfMoves.includes(4) && setOfMoves.includes(6)) {
                                     return 5;
                                 }
 
                                 break;
                         case 6:
-                                if (this.moves.includes(3) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(3) && setOfMoves.includes(9)) {
                                     return 6;
                                 }
 
-                                if (this.moves.includes(4) && this.moves.includes(5)) {
+                                if (setOfMoves.includes(4) && setOfMoves.includes(5)) {
                                     return 6;
                                 }
                                 break;
                         case 7:
-                                if (this.moves.includes(1) && this.moves.includes(4)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(4)) {
                                     return 7;
                                 }
-                                if (this.moves.includes(5) && this.moves.includes(3)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(3)) {
                                     return 7;
                                 }
-                                if (this.moves.includes(8) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(8) && setOfMoves.includes(9)) {
                                     return 7;
                                 }
                                 break;
                         case 8:
-                                if (this.moves.includes(5) && this.moves.includes(2)) {
+                                if (setOfMoves.includes(5) && setOfMoves.includes(2)) {
                                     return 8;
                                 }
-                                if (this.moves.includes(7) && this.moves.includes(9)) {
+                                if (setOfMoves.includes(7) && setOfMoves.includes(9)) {
                                     return 8;
                                 }
                                 break;
                         case 9:
-                                if (this.moves.includes(1) && this.moves.includes(5)) {
+                                if (setOfMoves.includes(1) && setOfMoves.includes(5)) {
                                     return 9;
                                 }
 
-                                if (this.moves.includes(7) && this.moves.includes(8)) {
+                                if (setOfMoves.includes(7) && setOfMoves.includes(8)) {
                                     return 9;
                                 }
 
-                                if (this.moves.includes(3) && this.moves.includes(6)) {
+                                if (setOfMoves.includes(3) && setOfMoves.includes(6)) {
                                     return 9;
                                 }
                                 break;
@@ -282,10 +273,9 @@
                                 return 0;
                     }
                 }
-                
-                console.log("none found");
-                return 0;
+                return 0;            
             }
+
             this.randomMove = function() {
                 return this.openSpaces[Math.floor(Math.random() * this.openSpaces.length)];
             }
