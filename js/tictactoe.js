@@ -344,11 +344,14 @@
                         this.squareObjects[i].removeClass("xChoice");
                     } else if (this.squareObjects[i].hasClass("oChoice")) {
                         this.squareObjects[i].removeClass("oChoice");
+                    } else if (this.squareObjects[i].hasClass("xWin")) {
+                        this.squareObjects[i].removeClass("xWin");
+                    } else if (this.squareObjects[i].hasClass("oWin")) {
+                        this.squareObjects[i].removeClass("oWin");
                     }
                 }
                 for (var i = 0; i < this.players.length; i++) {
                     this.players[i].resetMoves();
-                    console.log(this.players[i].getName() + this.players[i].getMoves());
                 }
                 let spacesLeft = this.openSpaces.length;
                 for (var i = 0; i < spacesLeft; i++) {
@@ -383,6 +386,7 @@
                         return $.inArray(v, playerMoves) !== -1;
                     }).length === singleWinCondition.length;
                     if (success) {
+                        threeSquares = singleWinCondition;
                         break;
                     }
                 }
@@ -391,6 +395,16 @@
                     this.isGameOver = true;
                     this.disableAllSquares();
                     this.messageDiv.text(player.getName() + " has won! Press reset to restart the game");
+
+                    let winSide;
+                    if (player.getIsXPlayer()) {
+                        winSide = "xWin";
+                    } else {
+                        winSide = "oWin";
+                    }
+                    for (var i = threeSquares.length - 1; i >= 0; i--) {
+                        this.squareObjects[threeSquares[i] - 1].addClass(winSide).removeClass(player.getPlayerClass());
+                    }
                 }
                 // check if squares remainining is 0
                 if (this.openSpaces.length === 0) {
@@ -399,6 +413,8 @@
                     this.messageDiv.text("Tie! Press reset to restart the game.");
                 }
             }
+
+
 
             this.setAI = function(AI) {
                 this.AIPlayer = AI;
@@ -422,6 +438,11 @@
             this.swapSides = function() {
                 for (var i = this.players.length - 1; i >= 0; i--) {
                     this.players[i].changeSides();
+                    if (this.players[i].getIsXPlayer()) {
+                        this.players[i].setPlayerClass("xChoice");
+                    } else {
+                        this.players[i].setPlayerClass("oChoice");
+                    }
                 }
             }
 
@@ -453,14 +474,14 @@
         var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset").addClass("topRow");
         var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls").addClass("topRow");
         var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions").addClass("topRow");
-        var playerSideDiv = $("<div>").text("Playing as X's").addClass("playerSide").addClass("topRow");
+        var playerSideDiv = $("<div>").text("You are X's").addClass("playerSide").addClass("topRow");
         $("#TicTacToe").append(resetButton);
         $("#TicTacToe").append(changeSidesButton);
         $("#TicTacToe").append(instructionsDiv);
         $("#TicTacToe").append(playerSideDiv);
 
         var playerOne = new Player("Player 1", true, "xChoice");
-        var AI = new AIPlayer(2, "AI", false, "oChoice");
+        var AI = new AIPlayer(0, "AI", false, "oChoice");
         var game = new Game(instructionsDiv);
         game.addPlayer(playerOne);
         game.addPlayer(AI);
@@ -500,61 +521,18 @@
         });
 
         changeSidesButton.on("click", function() {
+            console.log(playerOne.getIsXPlayer());
             if (playerOne.getIsXPlayer()) {
-                playerSideDiv.text("Playing as O's");
+                playerSideDiv.text("You are O's");
             } else {
-                playerSideDiv.text("Playing as X's");
+                playerSideDiv.text("You are X's");
             }
             game.swapSides();
             game.reset();
+            if (AI.getIsXPlayer()) {
+                game.takeTurn(AI.makeMove(game));
+            }
         });
-        /*
-        function checkWin(player) {
-            var movesToCheck = player.getMoves();
-
-            if (movesToCheck.includes(1)) {
-                if (movesToCheck.includes(2) && movesToCheck.includes(3)) {
-                    return true;
-                }
-                if (movesToCheck.includes(4) && movesToCheck.includes(7)) {
-                    return true;
-                }
-                if (movesToCheck.includes(5) && movesToCheck.includes(9)) {
-                    return true;
-                }
-            } 
-            if (movesToCheck.includes(2) && movesToCheck.includes(5)
-                    && movesToCheck.includes(8)) {
-                return true;
-            }
-            if (movesToCheck.includes(3)) {
-                if (movesToCheck.includes(5) && movesToCheck.includes(7)) {
-                    return true;
-                }
-
-                if (movesToCheck.includes(6) && movesToCheck.includes(9)) {
-                    return true;
-                }
-            }
-            if (movesToCheck.includes(4)) {
-                if (movesToCheck.includes(5) && movesToCheck.includes(6)) {
-                    return true;
-                }
-            }
-            if (movesToCheck.includes(7)) {
-                if (movesToCheck.includes(8) && movesToCheck.includes(9)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        */
-
-
-        // Add Rules
-        // Add check win condition
-        // Takes in either player or AI 'objects'
 
         /*
             TODO
