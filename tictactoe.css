@@ -66,15 +66,35 @@
 
 .reset {
     grid-area: reset;
+    margin: auto;
+    height: 30px;
+    width: 70px;
 }
 
 .controls {
     grid-area: controls;
+    margin: auto;
+    height: 30px;
+    width: 130px;
 }
 
 .instructions {
     grid-area: instructions;
     margin: auto;
+}
+
+.instructions-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px
+}
+
+.instructions-wrapper-win {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .playerSide {

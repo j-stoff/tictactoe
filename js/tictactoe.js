@@ -394,7 +394,7 @@
                 if (success) {
                     this.isGameOver = true;
                     this.disableAllSquares();
-                    this.messageDiv.text(player.getName() + " has won! Press reset to restart the game");
+                    this.messageDiv.text(player.getName() + " has won! Press reset to restart the game").parent().removeClass("instructions-wrapper").addClass("instructions-wrapper-win");
 
                     let winSide;
                     if (player.getIsXPlayer()) {
@@ -473,11 +473,13 @@
 
         var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset").addClass("topRow");
         var changeSidesButton = $("<input>").attr("type", "button").attr("value", "Change sides").addClass("controls").addClass("topRow");
+        var instructionsWrapper = $("<div>").addClass("instructions-wrapper");
         var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions").addClass("topRow");
         var playerSideDiv = $("<div>").text("You are X's").addClass("playerSide").addClass("topRow");
+        instructionsWrapper.append(instructionsDiv);
         $("#TicTacToe").append(resetButton);
         $("#TicTacToe").append(changeSidesButton);
-        $("#TicTacToe").append(instructionsDiv);
+        $("#TicTacToe").append(instructionsWrapper);
         $("#TicTacToe").append(playerSideDiv);
 
         var playerOne = new Player("Player 1", true, "xChoice");
