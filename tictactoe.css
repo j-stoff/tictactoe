@@ -67,15 +67,11 @@
 .reset {
     grid-area: reset;
     margin: auto;
-    height: 30px;
-    width: 70px;
 }
 
 .controls {
     grid-area: controls;
     margin: auto;
-    height: 30px;
-    width: 130px;
 }
 
 .instructions {
@@ -113,18 +109,88 @@
     grid-column-gap: 20px;
 }
 
-.xChoice {
+.font-md {
+    font-size: 19px;
+}
+
+.font-lg {
+    font-size: 22px;
+}
+
+.reset-sm {
+    height: 30px;
+    width: 70px;    
+}
+
+.reset-md {
+    height: 35px;
+    width: 130px;
+}
+
+.reset-lg {
+    height: 40px;
+    width: 200px;
+}
+
+.controls-sm {
+    height: 30px;
+    width: 130px;
+}
+
+.controls-md {
+    height: 35px;
+    width: 200px;
+}
+
+.controls-lg {
+    height: 40px;
+    width: 200px;
+}
+
+.xChoice-sm {
     background-image: url("images/x-img.png");
 }
 
-.oChoice {
+.xChoice-md {
+    background-image: url("images/x-img-md.png");
+}
+
+.xChoice-lg {
+    background-image: url("images/x-img-lg.png");
+}
+
+.oChoice-sm {
     background-image: url("images/o-img.png");
 }
 
-.xWin {
+.oChoice-md {
+    background-image: url("images/o-img-md.png");
+}
+
+.oChoice-lg {
+    background-image: url("images/o-img-lg.png");
+}
+
+.xWin-sm {
     background-image: url("images/x-win.png");
 }
 
-.oWin {
+.xWin-md {
+    background-image: url("images/x-win-md.png");
+}
+
+.xWin-lg {
+    background-image: url("images/x-win-lg.png");
+}
+
+.oWin-sm {
     background-image: url("images/o-win.png");
+}
+
+.oWin-md {
+    background-image: url("images/o-win-md.png");
+}
+
+.oWin-lg {
+    background-image: url("images/o-win-lg.png");
 }

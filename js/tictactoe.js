@@ -295,12 +295,15 @@
         AIPlayer.prototype.constructor = AIPlayer;
 
 
-        function Game(messageContainer) {
+        function Game(resetButton, changeSidesButton, messageContainer, playerSideDiv,size) {
             this.players = [];
             this.AIPlayer;
             this.gameOver = false;
             this.squareObjects = [];
             this.openSpaces = [];
+            this.resetButton = resetButton;
+            this.changeSidesButton = changeSidesButton;
+            this.playerSideDiv = playerSideDiv;
             let topRow = [1, 2, 3];
             let middleRow = [4, 5, 6];
             let bottomRow = [7, 8, 9];
@@ -309,11 +312,25 @@
             let rightColumn = [3, 6, 9];
             let diagonalTopToBottom = [1, 5, 9];
             let diagonalBottomToTop = [7, 5, 3];
+            let xSide = "xChoice-" + size;
+            let oSide = "oChoice-" + size;
+            let resetSize = "reset-" + size;
+            let controlSize = "controls-" + size;
+            let xWin = "xWin-" + size;
+            let oWin = "oWin-" + size;
+            let font = "font-" + size;
             this.winConditions = [topRow, middleRow, bottomRow, leftColumn, 
                     middleColumn, rightColumn, diagonalTopToBottom,
                     diagonalBottomToTop];
             this.messageDiv = messageContainer;
             this.isGameOver = false;
+
+            this.resetButton.addClass(resetSize).addClass(font);
+            this.changeSidesButton.addClass(controlSize).addClass(font);
+            this.messageDiv.addClass(font);
+            this.playerSideDiv.addClass(font);
+
+
 
             this.addPlayer = function(player) {
                 this.players.push(player);
@@ -340,14 +357,14 @@
                 for (var i = 0; i < this.squareObjects.length; i++) {
                     this.squareObjects[i].off("click");
                     addSquareSelect(this.squareObjects[i]);
-                    if (this.squareObjects[i].hasClass("xChoice")) {
-                        this.squareObjects[i].removeClass("xChoice");
-                    } else if (this.squareObjects[i].hasClass("oChoice")) {
-                        this.squareObjects[i].removeClass("oChoice");
-                    } else if (this.squareObjects[i].hasClass("xWin")) {
-                        this.squareObjects[i].removeClass("xWin");
-                    } else if (this.squareObjects[i].hasClass("oWin")) {
-                        this.squareObjects[i].removeClass("oWin");
+                    if (this.squareObjects[i].hasClass(xSide)) {
+                        this.squareObjects[i].removeClass(xSide);
+                    } else if (this.squareObjects[i].hasClass(oSide)) {
+                        this.squareObjects[i].removeClass(oSide);
+                    } else if (this.squareObjects[i].hasClass(xWin)) {
+                        this.squareObjects[i].removeClass(xWin);
+                    } else if (this.squareObjects[i].hasClass(oWin)) {
+                        this.squareObjects[i].removeClass(oWin);
                     }
                 }
                 for (var i = 0; i < this.players.length; i++) {
@@ -362,8 +379,6 @@
                 }
                 instructionsDiv.text("X player moves first");
 
-                // If AI is X, move first.
-                // TODO AI moves first when player is O
                 if (AI.getIsXPlayer() === true) {
                     console.log("AI move");
                 }
@@ -398,9 +413,9 @@
 
                     let winSide;
                     if (player.getIsXPlayer()) {
-                        winSide = "xWin";
+                        winSide = xWin;
                     } else {
-                        winSide = "oWin";
+                        winSide = oWin;
                     }
                     for (var i = threeSquares.length - 1; i >= 0; i--) {
                         this.squareObjects[threeSquares[i] - 1].addClass(winSide).removeClass(player.getPlayerClass());
@@ -463,10 +478,12 @@
         // Sizes
         // 500
         // 700
-        // 900 
-        let side = 500;
+        // 900
+        let sizeFactor = 2;
+        let side = 500 + sizeFactor * 200;
         let width = side;
         let height = side;
+        let size = "lg";
         var squareEvents = [];
         $("#TicTacToe").css("width", width).css("height", height);
         var gameContainer = $("<div>").addClass("gameContainer").css("width", width).css("height", height);
@@ -482,9 +499,9 @@
         $("#TicTacToe").append(instructionsWrapper);
         $("#TicTacToe").append(playerSideDiv);
 
-        var playerOne = new Player("Player 1", true, "xChoice");
-        var AI = new AIPlayer(0, "AI", false, "oChoice");
-        var game = new Game(instructionsDiv);
+        var playerOne = new Player("Player 1", true, "xChoice-" + size);
+        var AI = new AIPlayer(0, "AI", false, "oChoice-" + size);
+        var game = new Game(resetButton, changeSidesButton, instructionsDiv, playerSideDiv,size);
         game.addPlayer(playerOne);
         game.addPlayer(AI);
         game.setAI(AI);
