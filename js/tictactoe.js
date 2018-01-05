@@ -1,15 +1,26 @@
-// For creating the UI display
 (function($) { 
     $(document).ready(function() {
 
         $.fn.tictactoe = function(options) {
+            var sizeFactor;
+            switch (options.size) {
+                case "md":
+                        sizeFactor = 1;
+                        break;
+                case "lg":
+                        sizeFactor = 2;
+                        break;
+                default:
+                        sizeFactor = 0;
+                        break;
+            }
+
             var settings = $.extend({
-                // These are the defaults.
                 size: "sm",
-                sizeFactor: 0
+                aiDiff: 0
             }, options );
 
-            let side = 500 + settings.sizeFactor * 200;
+            let side = 500 + sizeFactor * 200;
             let width = side;
             let height = side;
             function Player(name, isXSide, playerClass) {
@@ -65,7 +76,6 @@
                }
             }
 
-            //AI class extends player
             function AIPlayer(difficulty, name, isPlayerX, playerClass) {
                 this.diff = difficulty;
                 this.opponentMoves;
@@ -73,11 +83,8 @@
 
                 Player.call(this, name, isPlayerX, playerClass);
 
-                // TODO expand difficulty, maybe have a cool algorithm
                 this.makeMove = function(game) {
-                    // The big function
                     if (this.diff === 2) {
-                        // Goes middle if second, goes corner if first
                         if (!this.isPlayerX && this.openSpaces.includes(5)) {
                             this.moveCleanUp(5, game);
                             return 5;
@@ -88,42 +95,34 @@
 
                         move = this.selectedMove(this.moves);
 
-                        // Wins game if possible
                         if (move != 0) {
                             this.moveCleanUp(move, game);
                             return move;
                         }
 
 
-                        // block move
                         move = this.selectedMove(this.opponentMoves);
                         if (move != 0) {
                             this.moveCleanUp(move, game);
                             return move;
                         }
 
-
-                        // Prioritize corners
                         if (cornerMoves.length > 1) {
                             move = cornerMoves[Math.floor(Math.random() * cornerMoves.length)];
                             this.moveCleanUp(move, game);
                             return move;
                         }
 
-                        // random move
                         move = this.randomMove();
                         this.moveCleanUp(move, game);
 
                         return move;
                     } else if (this.diff === 1) {
-                        // Goes to the middle if open
-                        // Tries to win
-                        // random move
                         if (this.openSpaces.includes(5)) {
                             this.moveCleanUp(5, game);
                             return 5;
                         }
-                        var move = this.selectedMove(this.openSpaces);
+                        var move = this.selectedMove(this.moves);
 
                         if (move != 0) {
                             this.moveCleanUp(move, game);
@@ -161,7 +160,6 @@
                     return this.openSpaces;
                 }
 
-                // Private methods
                 this.makeCornerArray = function() {
                     let corners = [];
                     if (this.openSpaces.includes(1)) {
@@ -362,7 +360,6 @@
                 }
 
                 this.reset = function() {
-                    //removeClickFromAllSquaresAndReset();
                     for (var i = 0; i < this.squareObjects.length; i++) {
                         this.squareObjects[i].off("click");
                         addSquareSelect(this.squareObjects[i]);
@@ -398,11 +395,9 @@
                 }
 
                 this.checkGameOver = function(player) {
-                    // check for a win
                     let playerMoves = player.getMoves();
                     var success = false;
                     var threeSquares = [];
-                    // TODO still needs work.
                     for (var i = 0; i < this.winConditions.length; i++) {
                         let singleWinCondition = this.winConditions[i];
                         success = $.grep(singleWinCondition, function(v, i) {
@@ -429,7 +424,6 @@
                             this.squareObjects[threeSquares[i] - 1].addClass(winSide).removeClass(player.getPlayerClass());
                         }
                     }
-                    // check if squares remainining is 0
                     if (this.openSpaces.length === 0) {
                         this.isGameOver = true;
                         this.disableAllSquares();
@@ -495,7 +489,7 @@
             $("#TicTacToe").append(playerSideDiv);
 
             var playerOne = new Player("Player 1", true, "xChoice-" + settings.size);
-            var AI = new AIPlayer(0, "AI", false, "oChoice-" + settings.size);
+            var AI = new AIPlayer(settings.aiDiff, "AI", false, "oChoice-" + settings.size);
             var game = new Game(resetButton, changeSidesButton, instructionsDiv, playerSideDiv,settings.size);
             game.addPlayer(playerOne);
             game.addPlayer(AI);
@@ -503,7 +497,6 @@
             AI.setOpenSpaces(game.getOpenSpaces());
             AI.setOpponentMoves(playerOne.getMoves());
            
-            // Add squares to the game
             for(var index = 1; index < 10; index += 1) {
                 var className = "box" + index;
                 var square = $("<div>").addClass(className).attr("id", index);
@@ -512,7 +505,6 @@
                 gameContainer.append(square); 
                 addSquareSelect(square);
             }
-            // Function to add square onclick events
             function addSquareSelect(square) {
                 square.on("click", function(event) {
                     square.addClass(playerOne.getPlayerClass());
