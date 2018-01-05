@@ -1,9 +1,19 @@
 (function($) { 
     $(document).ready(function() {
+        
+        var init = function(caller, options) {
+            var settings;
+            if (options) {
+                settings = $.extend({
+                    size: "sm",
+                    aiDiff: 0
+                }, options );
+            } else {
+                settings = {size: "sm", aiDiff: 0}
+            }
 
-        $.fn.tictactoe = function(options) {
             var sizeFactor;
-            switch (options.size) {
+            switch (settings.size) {
                 case "md":
                         sizeFactor = 1;
                         break;
@@ -14,11 +24,6 @@
                         sizeFactor = 0;
                         break;
             }
-
-            var settings = $.extend({
-                size: "sm",
-                aiDiff: 0
-            }, options );
 
             let side = 500 + sizeFactor * 200;
             let width = side;
@@ -474,7 +479,8 @@
 
 
             var squareEvents = [];
-            $("#TicTacToe").css("width", width).css("height", height);
+            //var gameObject = $("<div>");
+            caller.addClass("game");
             var gameContainer = $("<div>").addClass("gameContainer").css("width", width).css("height", height);
 
             var resetButton = $("<input>").attr("type", "button").attr("value","Reset").addClass("reset").addClass("topRow");
@@ -483,10 +489,10 @@
             var instructionsDiv = $("<div>").text("X player moves first").addClass("instructions").addClass("topRow");
             var playerSideDiv = $("<div>").text("You are X's").addClass("playerSide").addClass("topRow");
             instructionsWrapper.append(instructionsDiv);
-            $("#TicTacToe").append(resetButton);
-            $("#TicTacToe").append(changeSidesButton);
-            $("#TicTacToe").append(instructionsWrapper);
-            $("#TicTacToe").append(playerSideDiv);
+            caller.append(resetButton);
+            caller.append(changeSidesButton);
+            caller.append(instructionsWrapper);
+            caller.append(playerSideDiv);
 
             var playerOne = new Player("Player 1", true, "xChoice-" + settings.size);
             var AI = new AIPlayer(settings.aiDiff, "AI", false, "oChoice-" + settings.size);
@@ -520,7 +526,7 @@
             }
 
 
-            $("#TicTacToe").append(gameContainer);
+            caller.append(gameContainer);
 
             resetButton.on("click", function() {
                 game.reset();
@@ -535,6 +541,14 @@
                 game.swapSides();
                 game.reset();
             });
-        };
+
+            return caller;
+        }
+        
+        $.fn.tictactoe = function(options) {
+            return init(this, options);
+        }
+        
     });
+
 })(jQuery);

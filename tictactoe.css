@@ -98,7 +98,7 @@
     margin: auto;
 }
 
-#TicTacToe {
+.game {
     display: grid;
     margin: auto;
     grid-template-areas:

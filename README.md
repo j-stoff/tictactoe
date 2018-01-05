@@ -30,3 +30,5 @@ This will create a small version of the game with the AI set to hard difficulty.
 First, the AI is hard coded. No machine learning or fancy algorithms used for decision making. At it's hardest difficulty it makes a move based on the following: if the middle square is open and it is not first, if it can win with the move, if the opponent can win it will block, if there are still corners to, and finally a random move based on the squares left.
 
 Second, the images I created are very simple and can be changed quite easily. Simply delete the old image and replace it with an image of your choosing. The name must match the old example or it won't be found.
+
+Third, the only browser to work at the moment is FireFox. This is due to the css using grid-template-area. None of the other browsers seem to use this in the same way, and I am looking for a solution at the moment.
