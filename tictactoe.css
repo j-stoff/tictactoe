@@ -56,7 +56,6 @@
         'box7 box8 box9';
     margin: auto;
     
-    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
     grid-area: game;
 }
 

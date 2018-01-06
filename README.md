@@ -31,4 +31,4 @@ First, the AI is hard coded. No machine learning or fancy algorithms used for de
 
 Second, the images I created are very simple and can be changed quite easily. Simply delete the old image and replace it with an image of your choosing. The name must match the old example or it won't be found.
 
-Third, the only browser to work at the moment is FireFox. This is due to the css using grid-template-area. None of the other browsers seem to use this in the same way, and I am looking for a solution at the moment.
+Third, the browsers to work are FireFox, Chrome, and Safari. Internet Explorer versions do not work though I have not tested Edge yet. The major issue is with the CSS grid-template-area being used in the browser or not.
